@@ -1,6 +1,7 @@
 #!/usr/bin/env/python
 
 import os.path
+import sys
 import time
 from datetime import date
 import urllib
@@ -42,14 +43,24 @@ def main():
     forecastList = element.getroot().findall("FORECAST")
     # FOR each forecast element
     for forecast in forecastList:
-        # Find the SIZE_MAXIMUM element in the current forecast.
-        maxSize = forecast.find("SIZE_MAXIMUM").text
-        minSize = forecast.find("SIZE_MINIMUM").text
+        # Find the relevant elements in the current forecast.
+        size = forecast.find("SIZE").text
+        maxSize = int(forecast.find("SIZE_MAXIMUM").text)
+        minSize = int(forecast.find("SIZE_MINIMUM").text)
         shape = forecast.find("SHAPE").text
         hour = forecast.find("HOUR").text
         day = forecast.find("DAY").text
-        print "Hour: %s on %s\nSize: %s - %s\nShape: %s\n" % \
-                (hour, day, minSize, maxSize, shape)
+        #print "Hour: %s on %s\nSize: %s (%s - %s)\nShape: %s\n" % \
+                #(hour, day, size, minSize, maxSize, shape)
+        sys.stdout.write("%s\t:" % (hour))
+        for sizeNdx in range(int(maxSize) + 1):
+            if sizeNdx < minSize:
+                sys.stdout.write(".")
+            elif sizeNdx == minSize or sizeNdx == maxSize:
+                sys.stdout.write("|")
+            else:
+                sys.stdout.write("-")
+        print ""
 
 if __name__ == "__main__":
     main()
