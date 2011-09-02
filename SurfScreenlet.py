@@ -3,14 +3,18 @@
 import os.path
 import sys
 import time
-from termcolor import colored
 from datetime import date, timedelta
 import urllib
 from xml.etree import ElementTree as ET
 
-spotId = "147"
-feedUrl = "http://www.spitcast.com/api/spot/forecast/" + spotId + "/?dcat=day&format=xml"
-feedPath = "data.xml"
+spotId = '147'
+feedUrl = 'http://www.spitcast.com/api/spot/forecast/' + spotId + '/?dcat=day&format=xml'
+feedPath = 'data.xml'
+
+red = '\033[31m'
+yellow = '\033[33m'
+greenblink = '\033[5;32m'
+endcolor = '\033[0m'
 
 # Determine if the data file exists and is up to date.
 def hasCurrentData():
@@ -29,26 +33,26 @@ def hasCurrentData():
 # Takes a letter representing a shape (from 'p' for poor, to 'g' for good),
 # and returns a number representing the shape between 0 (poor) and 4 (good).
 def convertShape(shapeLetter):
-    if shapeLetter == "p":
+    if shapeLetter == 'p':
         return 0
-    elif shapeLetter == "pf":
+    elif shapeLetter == 'pf':
         return 1
-    elif shapeLetter == "f":
+    elif shapeLetter == 'f':
         return 2
-    elif shapeLetter == "fg":
+    elif shapeLetter == 'fg':
         return 3
-    elif shapeLetter == "g":
+    elif shapeLetter == 'g':
         return 4
 
 def formatData(sizeText, shapeRank):
     if shapeRank == 2:
-        return colored(sizeText, 'yellow')
+        return red + sizeText + endcolor
     elif shapeRank == 3:
-        return colored(sizeText, 'green')
+        return yellow + sizeText + endcolor
     elif shapeRank == 4:
-        return colored(sizeText, 'green', attrs=['blink'])
+        return greenblink + sizeText + endcolor
     else:
-        return ""
+        return ''
 
 # Converts a string containing 12-hour time plus "AM" or "PM" to
 # 24-hour rime.
@@ -56,9 +60,9 @@ def make24(hourtext):
     amPm = hourtext[-2:]
     hourNum = int(hourtext[:-2])
     hourNum %= 12
-    if amPm == "PM":
+    if amPm == 'PM':
         hourNum += 12
-    elif amPm == "AM" and hourNum == 12:
+    elif amPm == 'AM' and hourNum == 12:
         hourNum = 0
     return hourNum
 
@@ -73,44 +77,43 @@ def main():
         try:
             feed = urllib.urlopen(feedUrl)
         except:
-            print "Could not retrieve forecast data."
+            print 'Could not retrieve forecast data.'
             exit()
         # Parse the retrieved forecast data.
         element = ET.parse(feed)
         # Write the data to the data file.
         element.write(feedPath)
+    spotName = element.getroot().find('NAME').text
+    date = element.getroot().find('DATE').text
+    print 'Forecast for %s on %s:' % (spotName, date)
     # Make list of all FORECAST elements in feed data.
-    forecastList = element.getroot().findall("FORECAST")
+    forecastList = element.getroot().findall('FORECAST')
     # FOR each forecast element
     for forecast in forecastList:
         # Find the relevant elements in the current forecast.
-        size = forecast.find("SIZE").text
-        maxSize = int(forecast.find("SIZE_MAXIMUM").text)
-        minSize = int(forecast.find("SIZE_MINIMUM").text)
-        shape = convertShape(forecast.find("SHAPE").text)
-        hour = make24(forecast.find("HOUR").text)
-        day = forecast.find("DAY").text
+        size = forecast.find('SIZE').text
+        maxSize = int(forecast.find('SIZE_MAXIMUM').text)
+        minSize = int(forecast.find('SIZE_MINIMUM').text)
+        shape = convertShape(forecast.find('SHAPE').text)
+        hour = make24(forecast.find('HOUR').text)
+        day = forecast.find('DAY').text
         # If shape is less than "fair", do not print conditions.
         if shape < 2:
             continue
-        #sys.stdout.write("%s\t:" % (hour))
-        dataStr = ("%s\t:" % hour)
+        timeStr = '%s\t:' % hour
         # Get today's date.
         #today = date.today();
         # Calculate tomorrow's date.
         #tomorrow = today + timedelta(1)
+        dataStr = ''
         for sizeNdx in range(int(maxSize) + 1):
             if sizeNdx < minSize:
                 dataStr += '.'
-                #sys.stdout.write(".")
             elif sizeNdx == minSize or sizeNdx == maxSize:
-                #sys.stdout.write("|")
                 dataStr += '|'
             else:
-                #sys.stdout.write("=")
                 dataStr += '='
-        #print ""
-        print formatData(dataStr, shape)
+        print '%s%s' % (timeStr, formatData(dataStr, shape))
 
 
 if __name__ == "__main__":
