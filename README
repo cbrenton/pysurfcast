@@ -1,6 +1,10 @@
 SurfScreenlet will eventually be a Screenlet (http://screenlets.org/index.php/Home). It will display a visualization of surf forecasts for a specified surf spot on the desktop. The forecast data comes from the Spitcast API (http://www.spitcast.com/api/docs/).
 
-SurfScreenlet
+SurfScreenlet currently parses a surf forecast from Spitcast and displays relevant information in the terminal.
+
+SurfScreenlet is in sort of an awkward phase in its life. It is undergoing strange changes that are sometimes a little bit scary. New hormones are beginning to flow through its body, which make SurfScreenlet a little bit crazy at times.
+
+Please don't make fun of SurfScreenlet; it's very sensitive.
 
 Copyright (c) 2011, Chris Brenton
 All rights reserved.
