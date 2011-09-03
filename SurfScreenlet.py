@@ -85,9 +85,11 @@ def main():
         element.write(feedPath)
     spotName = element.getroot().find('NAME').text
     date = element.getroot().find('DATE').text
+    absMaxSize = int(element.getroot().find('SIZE_MAX').text)
     print 'Forecast for %s on %s:' % (spotName, date)
     # Make list of all FORECAST elements in feed data.
     forecastList = element.getroot().findall('FORECAST')
+    forecastDataList = []
     # FOR each forecast element
     for forecast in forecastList:
         # Find the relevant elements in the current forecast.
@@ -97,6 +99,9 @@ def main():
         shape = convertShape(forecast.find('SHAPE').text)
         hour = make24(forecast.find('HOUR').text)
         day = forecast.find('DAY').text
+        curForecastData = {'size':size, 'minSize':minSize, 'maxSize':maxSize, \
+                'shape':shape, 'hour':hour}
+        forecastDataList.append(curForecastData)
         # If shape is less than "fair", do not print conditions.
         if shape < 2:
             continue
@@ -113,7 +118,21 @@ def main():
                 dataStr += '|'
             else:
                 dataStr += '='
-        print '%s%s' % (timeStr, formatData(dataStr, shape))
+        #print '%s%s' % (timeStr, formatData(dataStr, shape))
+    for heightIndex in range(absMaxSize + 1):
+        height = absMaxSize - heightIndex
+        for forecastData in forecastDataList:
+            if forecastData['minSize'] == height:
+                sys.stdout.write('-')
+            elif forecastData['maxSize'] == height:
+                sys.stdout.write('=')
+            elif forecastData['maxSize'] > height and \
+                    forecastData['minSize'] < height:
+                        sys.stdout.write('|')
+            else:
+                sys.stdout.write(' ')
+            #sys.stdout.write("%s" % forecastData['minSize']),
+        print ''
 
 if __name__ == "__main__":
     main()
