@@ -115,6 +115,5 @@ def main():
                 dataStr += '='
         print '%s%s' % (timeStr, formatData(dataStr, shape))
 
-
 if __name__ == "__main__":
     main()
