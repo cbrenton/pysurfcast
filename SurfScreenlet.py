@@ -109,7 +109,7 @@ def generateCircles(spotName, numCircles, circleSize, border = 1):
     imageHeight = c + border * 2
     im = Image.new("RGBA", (imageWidth, imageHeight), (0, 0, 0, 0))
     dr = ImageDraw.Draw(im)
-    startX = border
+    startX = border + (maxCircles - numCircles) * (border + circleSize + gap)
     startY = border
     for i in range(0, numCircles):
         curX = startX + (c + gap) * i
