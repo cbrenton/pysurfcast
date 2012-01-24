@@ -2,26 +2,33 @@
 
 import os.path
 import sys
+import Image, ImageDraw
 import time
 from datetime import date, timedelta
 import urllib
 from xml.etree import ElementTree as ET
 
-spotId = '147'
-feedUrl = 'http://www.spitcast.com/api/spot/forecast/' + spotId + '/?dcat=day&format=xml'
-feedPath = 'data.xml'
+defaultSpot = '147'
 
 red = '\033[31m'
 yellow = '\033[33m'
 greenblink = '\033[5;32m'
 endcolor = '\033[0m'
 
+reds = [199, 160, 126, 69, 22]
+blues = [237, 222, 206, 181, 147]
+greens = [232, 214, 202, 196, 165]
+
+# Print usage information.
+def usage():
+    print("Usage:  %s" % os.path.basename(sys.argv[0]))
+
 # Determine if the data file exists and is up to date.
-def hasCurrentData():
+def hasCurrentData(dataFile):
     # IF file exists
-    if os.path.isfile(feedPath):
+    if os.path.isfile(dataFile):
         # Get modified date of file.
-        modDate = date.fromtimestamp(os.path.getmtime(feedPath))
+        modDate = date.fromtimestamp(os.path.getmtime(dataFile))
         # Get today's date.
         today = date.today();
         # IF the modified date is before today's date
@@ -66,27 +73,60 @@ def make24(hourtext):
         hourNum = 0
     return hourNum
 
-def main():
-    # IF forecast data is current.
-    if hasCurrentData():
-        # Parse the forecast data from the file.
-        element = ET.parse(feedPath)
-    # IF forecast data is from a previous day.
-    else:
-        # Retrieve feed data.
-        try:
-            feed = urllib.urlopen(feedUrl)
-        except:
-            print 'Could not retrieve forecast data.'
-            exit()
-        # Parse the retrieved forecast data.
-        element = ET.parse(feed)
-        # Write the data to the data file.
-        element.write(feedPath)
+def calculateCircles(element):
     spotName = element.getroot().find('NAME').text
     date = element.getroot().find('DATE').text
     absMaxSize = int(element.getroot().find('SIZE_MAX').text)
-    print 'Forecast for %s on %s:' % (spotName, date)
+    absMinSize = int(element.getroot().find('SIZE_MIN').text)
+    #print('Forecast for %s on %s:' % (spotName, date))
+    # Make list of all FORECAST elements in feed data.
+    forecastList = element.getroot().findall('FORECAST')
+    forecastDataList = []
+    totalShape = 0
+    totalSize = 0
+    # FOR each forecast element
+    for forecast in forecastList:
+        # Find the relevant elements in the current forecast.
+        size = forecast.find('SIZE').text
+        totalSize += int(size)
+        #maxSize = int(forecast.find('SIZE_MAXIMUM').text)
+        #minSize = int(forecast.find('SIZE_MINIMUM').text)
+        shape = convertShape(forecast.find('SHAPE').text)
+        totalShape += shape
+    avgShape = totalShape / len(forecastList)
+    avgSize = totalSize / len(forecastList)
+    #print('average shape: %f' % avgShape)
+    #print('height: %d - %d, %d' % (absMinSize, absMaxSize, avgSize))
+    generateCircles(spotName, int(avgShape), avgSize, absMaxSize - absMinSize)
+
+def generateCircles(spotName, numCircles, circleSize, border = 1):
+    c = 50
+    circleSize = min(circleSize, 1) * c
+    gap = c / 2
+    maxCircles = 5
+    outfile = spotName.lower().replace(" ", "") + ".png"
+    imageWidth = (c + border * 2) * maxCircles + gap * (maxCircles - 1)
+    imageHeight = c + border * 2
+    im = Image.new("RGBA", (imageWidth, imageHeight), (0, 0, 0, 0))
+    dr = ImageDraw.Draw(im)
+    startX = border
+    startY = border
+    for i in range(0, numCircles):
+        curX = startX + (c + gap) * i
+        colorNdx = min(i, len(reds))
+        r = reds[colorNdx]
+        g = greens[colorNdx]
+        b = blues[colorNdx]
+        dr.ellipse((curX - border, startY - border, curX + circleSize + border, startY + circleSize + border), fill=(55, 55, 55))
+        dr.ellipse((curX, startY, curX + circleSize, startY + circleSize), fill=(r, g, b))
+    im.save(outfile, "PNG")
+    #print('written to %s' % outfile)
+
+def printTextForecast(element):
+    spotName = element.getroot().find('NAME').text
+    date = element.getroot().find('DATE').text
+    absMaxSize = int(element.getroot().find('SIZE_MAX').text)
+    print('Forecast for %s on %s:' % (spotName, date))
     # Make list of all FORECAST elements in feed data.
     forecastList = element.getroot().findall('FORECAST')
     forecastDataList = []
@@ -118,7 +158,7 @@ def main():
                 dataStr += '|'
             else:
                 dataStr += '='
-        #print '%s%s' % (timeStr, formatData(dataStr, shape))
+        print('%s%s' % (timeStr, formatData(dataStr, shape)))
     for heightIndex in range(absMaxSize + 1):
         height = absMaxSize - heightIndex
         for forecastData in forecastDataList:
@@ -132,7 +172,41 @@ def main():
             else:
                 sys.stdout.write(' ')
             #sys.stdout.write("%s" % forecastData['minSize']),
-        print ''
+        print('')
+
+def main(argv=None):
+    args = sys.argv[1:]
+    if "-h" in args or "--help" in args:
+        usage()
+        sys.exit(2)
+    if len(sys.argv) > 1:
+        spotId = sys.argv[1]
+    else:
+        spotId = defaultSpot
+    feedUrl = 'http://www.spitcast.com/api/spot/forecast/' + spotId + '/?dcat=day&format=xml'
+    feedPath = 'data' + spotId + '.xml'
+    # IF forecast data is current.
+    if hasCurrentData(feedPath):
+        #print('Current data in cache.')
+        # Parse the forecast data from the file.
+        element = ET.parse(feedPath)
+    # IF forecast data is from a previous day.
+    else:
+        #print('No existing current data.')
+        # Retrieve feed data.
+        try:
+            feed = urllib.urlopen(feedUrl)
+        except:
+            print('Could not retrieve forecast data from %s' % getFeedUrl())
+            exit()
+        # Parse the retrieved forecast data.
+        element = ET.parse(feed)
+        # Write the data to the data file.
+        element.write(feedPath)
+    if "-t" in args or "--text" in args:
+        printTextForecast(element)
+    else:
+        calculateCircles(element)
 
 if __name__ == "__main__":
     main()
