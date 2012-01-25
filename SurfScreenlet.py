@@ -4,7 +4,7 @@ import os.path
 import sys
 import Image, ImageDraw
 import time
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import urllib
 from xml.etree import ElementTree as ET
 
@@ -82,43 +82,45 @@ def calculateCircles(element):
     # Make list of all FORECAST elements in feed data.
     forecastList = element.getroot().findall('FORECAST')
     forecastDataList = []
-    totalShape = 0
+    #totalShape = 0
     totalSize = 0
+    currentShape = 0
     # FOR each forecast element
     for forecast in forecastList:
         # Find the relevant elements in the current forecast.
         size = forecast.find('SIZE').text
+        hour = make24(forecast.find('HOUR').text)
+        if hour == datetime.now().hour:
+            shape = convertShape(forecast.find('SHAPE').text)
         totalSize += int(size)
-        #maxSize = int(forecast.find('SIZE_MAXIMUM').text)
-        #minSize = int(forecast.find('SIZE_MINIMUM').text)
-        shape = convertShape(forecast.find('SHAPE').text)
-        totalShape += shape
-    avgShape = totalShape / len(forecastList)
     avgSize = totalSize / len(forecastList)
-    #print('average shape: %f' % avgShape)
     #print('height: %d - %d, %d' % (absMinSize, absMaxSize, avgSize))
-    generateCircles(spotName, int(avgShape), avgSize, absMaxSize - absMinSize)
+    generateCircles(spotName, int(shape), avgSize, absMaxSize - absMinSize)
 
 def generateCircles(spotName, numCircles, circleSize, border = 1):
     c = 50
-    circleSize = min(circleSize, 1) * c
+    maxHeight = 8.0
+    circleSize = int(min(circleSize, maxHeight) / maxHeight * c)
+    #print('circle size: %d' % circleSize)
     gap = c / 2
     maxCircles = 5
     outfile = spotName.lower().replace(" ", "") + ".png"
-    imageWidth = (c + border * 2) * maxCircles + gap * (maxCircles - 1)
-    imageHeight = c + border * 2
+    imageWidth = int(c * maxCircles + gap * (maxCircles - 0.75))
+    imageHeight = c + gap
     im = Image.new("RGBA", (imageWidth, imageHeight), (0, 0, 0, 0))
     dr = ImageDraw.Draw(im)
-    startX = border + (maxCircles - numCircles) * (border + circleSize + gap)
-    startY = border
-    for i in range(0, numCircles):
+    startX = gap / 8 + c / 2
+    startY = gap / 2 + c / 2
+    rad1 = circleSize / 2 + border
+    rad2 = circleSize / 2
+    for i in range(maxCircles - numCircles, maxCircles):
         curX = startX + (c + gap) * i
-        colorNdx = min(i, len(reds))
+        colorNdx = min(i - (maxCircles - numCircles), len(reds))
         r = reds[colorNdx]
         g = greens[colorNdx]
         b = blues[colorNdx]
-        dr.ellipse((curX - border, startY - border, curX + circleSize + border, startY + circleSize + border), fill=(55, 55, 55))
-        dr.ellipse((curX, startY, curX + circleSize, startY + circleSize), fill=(r, g, b))
+        dr.ellipse((curX - rad1, startY - rad1, curX + rad1, startY + rad1), fill=(55, 55, 55))
+        dr.ellipse((curX - rad2, startY - rad2, curX + rad2, startY + rad2), fill=(r, g, b))
     im.save(outfile, "PNG")
     #print('written to %s' % outfile)
 
@@ -183,16 +185,16 @@ def main(argv=None):
         spotId = sys.argv[1]
     else:
         spotId = defaultSpot
+    #if "-b" in args or "--best" in args:
+        #spotId = ;
     feedUrl = 'http://www.spitcast.com/api/spot/forecast/' + spotId + '/?dcat=day&format=xml'
     feedPath = 'data' + spotId + '.xml'
     # IF forecast data is current.
     if hasCurrentData(feedPath):
-        #print('Current data in cache.')
         # Parse the forecast data from the file.
         element = ET.parse(feedPath)
     # IF forecast data is from a previous day.
     else:
-        #print('No existing current data.')
         # Retrieve feed data.
         try:
             feed = urllib.urlopen(feedUrl)
