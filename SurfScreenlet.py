@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os
+import os.path
 import sys
 import getopt
 import urllib
@@ -10,7 +10,8 @@ from datetime import date, timedelta, datetime
 from xml.etree import ElementTree as ET
 
 defaultSpot = 147
-homeprefix = os.getcwd()
+filepath = os.path.realpath(__file__)
+homeprefix = filepath[:filepath.rfind('/')]
 dataDir = homeprefix + '/data/'
 imageDir = homeprefix + '/images/'
 
