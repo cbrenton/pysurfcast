@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os.path
+import os
 import sys
 import getopt
 import urllib
@@ -10,9 +10,9 @@ from datetime import date, timedelta, datetime
 from xml.etree import ElementTree as ET
 
 defaultSpot = 147
-homeprefix = '/Users/chris/Code/SurfScreenlet/'
-dataDir = homeprefix + 'data/'
-imageDir = homeprefix + 'images/'
+homeprefix = os.getcwd()
+dataDir = homeprefix + '/data/'
+imageDir = homeprefix + '/images/'
 
 red = '\033[31m'
 yellow = '\033[33m'
