@@ -2,13 +2,17 @@
 
 import os.path
 import sys
-import Image, ImageDraw
-import time
-from datetime import date, timedelta, datetime
+import getopt
 import urllib
+import time
+import Image, ImageDraw
+from datetime import date, timedelta, datetime
 from xml.etree import ElementTree as ET
 
-defaultSpot = '147'
+defaultSpot = 147
+homeprefix = '/Users/chris/Code/SurfScreenlet/'
+dataDir = homeprefix + 'data/'
+imageDir = homeprefix + 'images/'
 
 red = '\033[31m'
 yellow = '\033[33m'
@@ -19,9 +23,43 @@ reds = [199, 160, 126, 69, 22]
 blues = [237, 222, 206, 181, 147]
 greens = [232, 214, 202, 196, 165]
 
+prefs = {'verbose' : 0,
+         'spotId' : defaultSpot}
+
+def getPrefs():
+    """
+    Parse the commandline options.
+    Store options in the global 'prefs' dict,
+    and return the remaining arguments.
+    """
+    try:
+        opts, args = getopt.getopt(sys.argv[1:],"hps:tv")
+    except getopt.GetoptError, err:
+        print(str(err))
+        usage()
+        sys.exit(2)
+
+    for o, a in opts:
+        if o == '-h':
+            prefs['help'] = 1
+        if o == '-p':
+            prefs['printSpot'] = 1
+        if o == '-s':
+            prefs['spotId'] = a
+        if o == '-t':
+            prefs['text'] = 1
+        elif o == '-v':
+            prefs['verbose'] += 1
+    return args
+
+def log(msg, priority=1):
+    """ print the given message iff the verbose level is high enough """
+    if prefs['verbose'] >= priority:
+        print >> sys.stderr, msg
+
 # Print usage information.
 def usage():
-    print("Usage:  %s" % os.path.basename(sys.argv[0]))
+    print("Usage:  %s [spotid] [options]" % os.path.basename(sys.argv[0]))
 
 # Determine if the data file exists and is up to date.
 def hasCurrentData(dataFile):
@@ -73,7 +111,7 @@ def make24(hourtext):
         hourNum = 0
     return hourNum
 
-def calculateCircles(element):
+def calculateCircles(element, printSpotName = False):
     spotName = element.getroot().find('NAME').text
     date = element.getroot().find('DATE').text
     absMaxSize = int(element.getroot().find('SIZE_MAX').text)
@@ -82,7 +120,6 @@ def calculateCircles(element):
     # Make list of all FORECAST elements in feed data.
     forecastList = element.getroot().findall('FORECAST')
     forecastDataList = []
-    #totalShape = 0
     totalSize = 0
     currentShape = 0
     # FOR each forecast element
@@ -104,7 +141,7 @@ def generateCircles(spotName, numCircles, circleSize, border = 1):
     #print('circle size: %d' % circleSize)
     gap = c / 2
     maxCircles = 5
-    outfile = spotName.lower().replace(" ", "") + ".png"
+    outfile = imageDir + spotName.lower().replace(" ", "") + ".png"
     imageWidth = int(c * maxCircles + gap * (maxCircles - 0.75))
     imageHeight = c + gap
     im = Image.new("RGBA", (imageWidth, imageHeight), (0, 0, 0, 0))
@@ -177,18 +214,15 @@ def printTextForecast(element):
         print('')
 
 def main(argv=None):
-    args = sys.argv[1:]
-    if "-h" in args or "--help" in args:
+    # args = sys.argv[1:]
+    args = getPrefs()
+    log('PREFS: %s' % prefs)
+    if 'help' in prefs:
         usage()
         sys.exit(2)
-    if len(sys.argv) > 1:
-        spotId = sys.argv[1]
-    else:
-        spotId = defaultSpot
-    #if "-b" in args or "--best" in args:
-        #spotId = ;
-    feedUrl = 'http://www.spitcast.com/api/spot/forecast/' + spotId + '/?dcat=day&format=xml'
-    feedPath = 'data' + spotId + '.xml'
+    spotId = prefs['spotId']
+    feedUrl = 'http://www.spitcast.com/api/spot/forecast/' + str(spotId) + '/?dcat=day&format=xml'
+    feedPath = dataDir + 'data' + str(spotId) + '.xml'
     # IF forecast data is current.
     if hasCurrentData(feedPath):
         # Parse the forecast data from the file.
@@ -205,10 +239,12 @@ def main(argv=None):
         element = ET.parse(feed)
         # Write the data to the data file.
         element.write(feedPath)
-    if "-t" in args or "--text" in args:
+    if 'text' in prefs:
         printTextForecast(element)
-    else:
-        calculateCircles(element)
+    if 'printSpot' in prefs:
+        spotName = element.getroot().find('NAME').text
+        print(spotName)
+    calculateCircles(element, True)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
