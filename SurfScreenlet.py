@@ -129,7 +129,7 @@ def calculateCircles(element, printSpotName = False):
         size = forecast.find('SIZE').text
         hour = make24(forecast.find('HOUR').text)
         if hour == datetime.now().hour:
-            shape = convertShape(forecast.find('SHAPE').text)
+            shape = convertShape(forecast.find('SHAPE').text) + 1
         totalSize += int(size)
     avgSize = totalSize / len(forecastList)
     #print('height: %d - %d, %d' % (absMinSize, absMaxSize, avgSize))
