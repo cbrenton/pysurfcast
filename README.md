@@ -16,6 +16,7 @@ Please don't make fun of pysurfcast; it's very sensitive.
 
 ## Running
 *Options:*
+
  * **-h**: Print help message and exit.
  * **-p**: Echo the spot name to the terminal.
  * **-s [spotId]**: Get forecast data for the spot specified by spotID.
@@ -23,6 +24,7 @@ Please don't make fun of pysurfcast; it's very sensitive.
  * **-v**: Use verbose mode. Currently does nothing.
 
 *Examples:*
+
  * Output the forecast for spot 163 (Morro Bay) as an image and echo "Morro Bay" to the terminal:
    ./pysurfcast -s 163 -p
  * Output the forecast for spot 147 (The Hook) as text in the terminal:
