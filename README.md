@@ -30,7 +30,6 @@ Examples:
     ./pysurfcast -s 163 -p
 
  * Output the forecast for spot 147 (The Hook) as text in the terminal:
-
     ./pysurfcast -s 147 -t
 
 Copyright (c) 2011, Chris Brenton
