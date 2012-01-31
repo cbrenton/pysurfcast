@@ -15,7 +15,7 @@ Please don't make fun of pysurfcast; it's very sensitive.
  * **Python 2.6** or above
 
 ## Running
-*Options:*
+Options:
 
  * **-h**: Print help message and exit.
  * **-p**: Echo the spot name to the terminal.
@@ -23,7 +23,7 @@ Please don't make fun of pysurfcast; it's very sensitive.
  * **-t**: Output the forecast as text instead of an image.
  * **-v**: Use verbose mode. Currently does nothing.
 
-*Examples:*
+Examples:
 
  * Output the forecast for spot 163 (Morro Bay) as an image and echo "Morro Bay" to the terminal:
    ./pysurfcast -s 163 -p
