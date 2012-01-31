@@ -35,7 +35,7 @@ Examples:
 
     **./pysurfcast -s 147 -t**
 
-![alt text](http://i.imgur.com/fIh9L.png "iTerm 2 on OS X")
+![alt text](http://i.imgur.com/MwD4A.png "iTerm 2 on OS X")
 
 Copyright (c) 2011, Chris Brenton
 
