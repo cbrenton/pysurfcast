@@ -1,10 +1,32 @@
-SurfScreenlet will eventually be a Screenlet (http://screenlets.org/index.php/Home). It will display a visualization of surf forecasts for a specified surf spot on the desktop. The forecast data comes from the Spitcast API (http://www.spitcast.com/api/docs/).
+# pysurfcast
 
-SurfScreenlet currently parses a surf forecast from Spitcast and displays relevant information in the terminal.
+pysurfcast is a Python script that fetches surf forecast data for a specified surf spot using the [Spitcast API](http://www.spitcast.com/api/docs/) and outputs it in a number of formats for various uses.
 
-SurfScreenlet is in sort of an awkward phase in its life. It is undergoing strange changes that are sometimes a little bit scary. New hormones are beginning to flow through its body, which make SurfScreenlet a little bit crazy at times.
+pysurfcast displays a visualization of surf forecasts for a specified surf spot either in a terminal or as an image.
 
-Please don't make fun of SurfScreenlet; it's very sensitive.
+pysurfcast is not affiliated with Spitcast. However, the author of pysurfcast thinks that Spitcast is awesome. Without Spitcast, none of this would be possible.
+
+pysurfcast is in sort of an awkward phase in its life. It is undergoing strange changes that are sometimes a little bit scary. New hormones are beginning to flow through its body, which make pysurfcast a little bit crazy at times.
+
+Please don't make fun of pysurfcast; it's very sensitive.
+
+## Requirements
+* **[Python Imaging LibraryL](http://www.pythonware.com/products/pil/)**
+* **Python** 2.6 or above
+
+## Running
+*Options:*
+* **-h**: Print help message and exit.
+* **-p**: Echo the spot name to the terminal.
+* **-s [spotId]**: Get forecast data for the spot specified by spotID.
+* **-t**: Output the forecast as text instead of an image.
+* **-v**: Use verbose mode. Currently does nothing.
+
+*Examples:*
+* Output the forecast for spot 163 (Morro Bay) as an image and echo "Morro Bay" to the terminal:
+   ./pysurfcast -s 163 -p
+* Output the forecast for spot 147 (The Hook) as text in the terminal:
+   ./pysurfcast -s 147 -t
 
 Copyright (c) 2011, Chris Brenton
 All rights reserved.

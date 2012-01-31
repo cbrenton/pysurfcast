@@ -27,12 +27,12 @@ greens = [232, 214, 202, 196, 165]
 prefs = {'verbose' : 0,
          'spotId' : defaultSpot}
 
+"""
+Parse the commandline options.
+Store options in the global 'prefs' dict,
+and return the remaining arguments.
+"""
 def getPrefs():
-    """
-    Parse the commandline options.
-    Store options in the global 'prefs' dict,
-    and return the remaining arguments.
-    """
     try:
         opts, args = getopt.getopt(sys.argv[1:],"hps:tv")
     except getopt.GetoptError, err:
@@ -53,16 +53,22 @@ def getPrefs():
             prefs['verbose'] += 1
     return args
 
+"""
+Print the given message if and only if the verbose level is high enough.
+"""
 def log(msg, priority=1):
-    """ print the given message iff the verbose level is high enough """
     if prefs['verbose'] >= priority:
         print >> sys.stderr, msg
 
-# Print usage information.
+"""
+Print usage information.
+"""
 def usage():
     print("Usage:  %s [spotid] [options]" % os.path.basename(sys.argv[0]))
 
-# Determine if the data file exists and is up to date.
+"""
+Determine if the data file exists and is up to date.
+"""
 def hasCurrentData(dataFile):
     # IF file exists
     if os.path.isfile(dataFile):
@@ -76,8 +82,10 @@ def hasCurrentData(dataFile):
         else:
             return True
 
-# Takes a letter representing a shape (from 'p' for poor, to 'g' for good),
-# and returns a number representing the shape between 0 (poor) and 4 (good).
+"""
+Takes a letter representing a shape (from 'p' for poor, to 'g' for good),
+and returns a number representing the shape between 0 (poor) and 4 (good).
+"""
 def convertShape(shapeLetter):
     if shapeLetter == 'p':
         return 0
@@ -90,9 +98,14 @@ def convertShape(shapeLetter):
     elif shapeLetter == 'g':
         return 4
 
+"""
+Colorizes the size data text to be output based on shape.
+"""
 def formatData(sizeText, shapeRank):
-    if shapeRank == 2:
+    if shapeRank == 1:
         return red + sizeText + endcolor
+    elif shapeRank == 2:
+        return sizeText
     elif shapeRank == 3:
         return yellow + sizeText + endcolor
     elif shapeRank == 4:
@@ -100,8 +113,10 @@ def formatData(sizeText, shapeRank):
     else:
         return ''
 
-# Converts a string containing 12-hour time plus "AM" or "PM" to
-# 24-hour rime.
+"""
+Converts a string containing 12-hour time plus "AM" or "PM" to
+24-hour time.
+"""
 def make24(hourtext):
     amPm = hourtext[-2:]
     hourNum = int(hourtext[:-2])
@@ -112,6 +127,9 @@ def make24(hourtext):
         hourNum = 0
     return hourNum
 
+"""
+Find the size and number of circles to draw.
+"""
 def calculateCircles(element, printSpotName = False):
     spotName = element.getroot().find('NAME').text
     date = element.getroot().find('DATE').text
@@ -135,6 +153,9 @@ def calculateCircles(element, printSpotName = False):
     #print('height: %d - %d, %d' % (absMinSize, absMaxSize, avgSize))
     generateCircles(spotName, int(shape), avgSize, absMaxSize - absMinSize)
 
+"""
+Draw the circles based on the already calculated data.
+"""
 def generateCircles(spotName, numCircles, circleSize, border = 1):
     c = 50
     maxHeight = 8.0
@@ -162,6 +183,10 @@ def generateCircles(spotName, numCircles, circleSize, border = 1):
     im.save(outfile, "PNG")
     #print('written to %s' % outfile)
 
+"""
+Prints the forecast data as colored text.
+"""
+# TODO: Add a non-colored option.
 def printTextForecast(element):
     spotName = element.getroot().find('NAME').text
     date = element.getroot().find('DATE').text
