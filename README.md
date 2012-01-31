@@ -39,7 +39,19 @@ Examples:
 
 ## Interpreting Output
 
- *Needs to be added.*
+*Image output:*
+
+The image created by this script will show surf conditions at a single spot for the current hour. Several different factors can be determined, or at least guesstimated, from the image.
+
+* There will be between one and five circles of varying size. The number of circles represents wave shape. Spitcast quantifies this as Poor, Poor-Fair, Fair, Fair-Good, or Good. Placing this on a scale from 1 to 5 gives the number of circles that are drawn.
+
+* The size of the circles represents wave height. The circle will be 50px tall when the wave height is greater than or equal to the "maximum" height. Circle height is proportional to max height, so if the waves are half of the max height, the circles will be 25px tall. At 0 feet, the circles will be 0px tall. By default, the max is set as 8 feet, but that can be changed in the code. I should add a flag that lets you specify max height.
+
+* This is not fully working correctly, but the thickness of the border around the circle will eventually represent the maximum wave size for the day. It will work in the same way as the wave height, but it will draw a dark circle behind the colored one. At the peak wave size for the day, the border will not be visible.
+
+*Text output:*
+
+Coming as soon as I remember how this works.
 
 Copyright (c) 2011, Chris Brenton
 
