@@ -37,9 +37,7 @@ Examples:
 
 ![alt text](http://i.imgur.com/MwD4A.png "iTerm 2 on OS X")
 
-## Interpreting Output
-
-*Image output:*
+## Interpreting Image Output
 
 The image created by this script will show surf conditions at a single spot for the current hour. Several different factors can be determined, or at least guesstimated, from the image.
 
@@ -49,9 +47,11 @@ The image created by this script will show surf conditions at a single spot for 
 
 * This is not fully working correctly, but the thickness of the border around the circle will eventually represent the maximum wave size for the day. It will work in the same way as the wave height, but it will draw a dark circle behind the colored one. At the peak wave size for the day, the border will not be visible.
 
-*Text output:*
+## Interpreting Text Output
 
 Coming as soon as I remember how this works.
+
+## License and Stuff
 
 Copyright (c) 2011, Chris Brenton
 
