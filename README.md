@@ -29,13 +29,13 @@ Examples:
 
     **./pysurfcast -s 163 -p**
 
-![alt text](http://i.imgur.com/0f8fY.png "GeekTool 3 on OS X")
+![alt text](http://i.imgur.com/gdRS2.png "GeekTool 3 on OS X")
 
  * Output the forecast for spot 147 (The Hook) as text in the terminal:
 
     **./pysurfcast -s 147 -t**
 
-![alt text](http://i.imgur.com/Baf4j.png "iTerm 2 on OS X")
+![alt text](http://i.imgur.com/fIh9L.png "iTerm 2 on OS X")
 
 Copyright (c) 2011, Chris Brenton
 
