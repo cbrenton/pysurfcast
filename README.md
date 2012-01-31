@@ -37,6 +37,10 @@ Examples:
 
 ![alt text](http://i.imgur.com/MwD4A.png "iTerm 2 on OS X")
 
+## Interpreting Output
+
+ *Needs to be added.*
+
 Copyright (c) 2011, Chris Brenton
 
 All rights reserved.
