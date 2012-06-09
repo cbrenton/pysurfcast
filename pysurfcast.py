@@ -70,6 +70,9 @@ def usage():
 Determine if the data file exists and is up to date.
 """
 def hasCurrentData(dataFile):
+    # Make the data directory if it doesn't exist.
+    if not os.path.exists(dataDir):
+        os.makedirs(dataDir)
     # IF file exists
     if os.path.isfile(dataFile):
         # Get modified date of file.
@@ -180,6 +183,9 @@ def generateCircles(spotName, numCircles, circleSize, border = 1):
         b = blues[colorNdx]
         dr.ellipse((curX - rad1, startY - rad1, curX + rad1, startY + rad1), fill=(55, 55, 55))
         dr.ellipse((curX - rad2, startY - rad2, curX + rad2, startY + rad2), fill=(r, g, b))
+    # Make the images directory if it doesn't exist.
+    if not os.path.exists(imageDir):
+        os.makedirs(imageDir)
     im.save(outfile, "PNG")
     #print('written to %s' % outfile)
 
