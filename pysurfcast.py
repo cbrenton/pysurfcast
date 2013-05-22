@@ -151,16 +151,13 @@ Find the size and number of circles to draw.
 def calculateCircles(element, printSpotName = False):
     spotName = element.getroot().find('NAME').text
     date = element.getroot().find('DATE').text
-    #import pdb; pdb.set_trace()
-    # TODO: Find max and min size manually.
-    #absMaxSize = int(element.getroot().find('SIZE_MAX').text)
-    #absMinSize = int(element.getroot().find('SIZE_MIN').text)
     #print('Forecast for %s on %s:' % (spotName, date))
     # Make list of all FORECAST elements in feed data.
     forecastList = element.getroot().findall('FORECAST')
     forecastDataList = []
     totalSize = 0
     currentShape = 0
+    # TODO: Use a running average of the next few hours as wave size.
     currentSize = 0
     sizes = {}
     # FOR each forecast element
@@ -172,17 +169,9 @@ def calculateCircles(element, printSpotName = False):
             shape = convertShape(forecast.find('SHAPE').text) + 1
             currentSize = int(size)
         totalSize += int(size)
-        #sizes.append(int(size))
         sizes[hour] = int(size)
+    # Find the maximum wave size for the day to calculate border size.
     absMaxSize = max(sizes.values())
-    absMinSize = min(sizes.values())
-    #for hour in sizes.keys():
-        #print '%d: %d feet' % (hour, sizes[hour])
-    #print 'max: %d, min: %d, current: %d' % (absMaxSize, absMinSize, currentSize)
-    #avgSize = totalSize / len(forecastList)
-    #print('height: %d - %d, %d' % (absMinSize, absMaxSize, avgSize))
-    #generateCircles(spotName, int(shape), avgSize, absMaxSize - absMinSize)
-    #generateCircles(spotName, int(shape), currentSize, absMaxSize - absMinSize)
     generateCircles(spotName, int(shape), currentSize, absMaxSize)
 
 """
