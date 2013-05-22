@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python2.6
 
 import os.path
 import sys
@@ -130,20 +130,39 @@ def make24(hourtext):
         hourNum = 0
     return hourNum
 
+def indent(elem, level=0):
+    i = "\n" + level*"  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            indent(elem, level+1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
+
 """
 Find the size and number of circles to draw.
 """
 def calculateCircles(element, printSpotName = False):
     spotName = element.getroot().find('NAME').text
     date = element.getroot().find('DATE').text
-    absMaxSize = int(element.getroot().find('SIZE_MAX').text)
-    absMinSize = int(element.getroot().find('SIZE_MIN').text)
+    #import pdb; pdb.set_trace()
+    # TODO: Find max and min size manually.
+    #absMaxSize = int(element.getroot().find('SIZE_MAX').text)
+    #absMinSize = int(element.getroot().find('SIZE_MIN').text)
     #print('Forecast for %s on %s:' % (spotName, date))
     # Make list of all FORECAST elements in feed data.
     forecastList = element.getroot().findall('FORECAST')
     forecastDataList = []
     totalSize = 0
     currentShape = 0
+    currentSize = 0
+    sizes = {}
     # FOR each forecast element
     for forecast in forecastList:
         # Find the relevant elements in the current forecast.
@@ -151,10 +170,20 @@ def calculateCircles(element, printSpotName = False):
         hour = make24(forecast.find('HOUR').text)
         if hour == datetime.now().hour:
             shape = convertShape(forecast.find('SHAPE').text) + 1
+            currentSize = int(size)
         totalSize += int(size)
-    avgSize = totalSize / len(forecastList)
+        #sizes.append(int(size))
+        sizes[hour] = int(size)
+    absMaxSize = max(sizes.values())
+    absMinSize = min(sizes.values())
+    #for hour in sizes.keys():
+        #print '%d: %d feet' % (hour, sizes[hour])
+    #print 'max: %d, min: %d, current: %d' % (absMaxSize, absMinSize, currentSize)
+    #avgSize = totalSize / len(forecastList)
     #print('height: %d - %d, %d' % (absMinSize, absMaxSize, avgSize))
-    generateCircles(spotName, int(shape), avgSize, absMaxSize - absMinSize)
+    #generateCircles(spotName, int(shape), avgSize, absMaxSize - absMinSize)
+    #generateCircles(spotName, int(shape), currentSize, absMaxSize - absMinSize)
+    generateCircles(spotName, int(shape), currentSize, absMaxSize)
 
 """
 Draw the circles based on the already calculated data.
