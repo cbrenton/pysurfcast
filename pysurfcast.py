@@ -5,7 +5,7 @@ import sys
 import getopt
 import urllib
 import time
-import Image, ImageDraw
+from PIL import Image, ImageDraw
 from datetime import date, timedelta, datetime
 from xml.etree import ElementTree as ET
 
@@ -178,6 +178,7 @@ def calculateCircles(element, printSpotName = False):
 Draw the circles based on the already calculated data.
 """
 def generateCircles(spotName, numCircles, circleSize, border = 1):
+    # TODO: Add more buffer on the sides for large bordars.
     c = 50
     maxHeight = 8.0
     circleSize = int(min(circleSize, maxHeight) / maxHeight * c)
@@ -214,57 +215,45 @@ Prints the forecast data as colored text.
 def printTextForecast(element):
     spotName = element.getroot().find('NAME').text
     date = element.getroot().find('DATE').text
-    absMaxSize = int(element.getroot().find('SIZE_MAX').text)
-    print('Forecast for %s on %s:' % (spotName, date))
     # Make list of all FORECAST elements in feed data.
     forecastList = element.getroot().findall('FORECAST')
     forecastDataList = []
+    maxSize = max([int(x.find('SIZE').text) for x in forecastList])
+    minSize = min([int(x.find('SIZE').text) for x in forecastList])
+    print('Forecast for %s on %s:' % (spotName, date))
     # FOR each forecast element
     for forecast in forecastList:
         # Find the relevant elements in the current forecast.
         size = forecast.find('SIZE').text
-        maxSize = int(forecast.find('SIZE_MAXIMUM').text)
-        minSize = int(forecast.find('SIZE_MINIMUM').text)
         shape = convertShape(forecast.find('SHAPE').text)
         hour = make24(forecast.find('HOUR').text)
         day = forecast.find('DAY').text
-        curForecastData = {'size':size, 'minSize':minSize, 'maxSize':maxSize, \
-                'shape':shape, 'hour':hour}
+        curForecastData = {'size':size, 'shape':shape, 'hour':hour}
         forecastDataList.append(curForecastData)
         # If shape is less than "fair", do not print conditions.
-        if shape < 2:
-            continue
+        #if shape < 2:
+            #continue
         timeStr = '%s\t:' % hour
-        # Get today's date.
-        #today = date.today();
-        # Calculate tomorrow's date.
-        #tomorrow = today + timedelta(1)
         dataStr = ''
-        for sizeNdx in range(int(maxSize) + 1):
-            if sizeNdx < minSize:
-                dataStr += '.'
-            elif sizeNdx == minSize or sizeNdx == maxSize:
-                dataStr += '|'
-            else:
-                dataStr += '='
+        for sizeNdx in range(int(size)):
+            dataStr += '.'
+        dataStr += '|'
         print('%s%s' % (timeStr, formatData(dataStr, shape)))
-    for heightIndex in range(absMaxSize + 1):
-        height = absMaxSize - heightIndex
+    for heightIndex in range(maxSize + 1):
+        height = maxSize - heightIndex
         for forecastData in forecastDataList:
-            if forecastData['minSize'] == height:
+            #print '%d ?= %d ?= %d' % (minSize, height, maxSize)
+            if minSize == height:
                 sys.stdout.write('-')
-            elif forecastData['maxSize'] == height:
+            elif maxSize == height:
                 sys.stdout.write('=')
-            elif forecastData['maxSize'] > height and \
-                    forecastData['minSize'] < height:
-                        sys.stdout.write('|')
+            elif maxSize > height and minSize < height:
+                sys.stdout.write('|')
             else:
                 sys.stdout.write(' ')
-            #sys.stdout.write("%s" % forecastData['minSize']),
         print('')
 
 def main(argv=None):
-    # args = sys.argv[1:]
     args = getPrefs()
     log('PREFS: %s' % prefs)
     if 'help' in prefs:
