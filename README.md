@@ -15,6 +15,12 @@ Please don't make fun of pysurfcast; it's very sensitive.
  * **Python 2.6** or above
 
 ## Running
+
+Docker example:
+```
+docker run -it 475b50bc97c5 python pysurfcast.py -s 6 -t
+```
+
 Options:
 
  * **-h**: Print help message and exit.
