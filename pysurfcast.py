@@ -3,7 +3,7 @@
 import os.path
 import sys
 import getopt
-import urllib
+import urllib.request
 import time
 from PIL import Image, ImageDraw
 from datetime import date, timedelta, datetime
@@ -35,7 +35,7 @@ and return the remaining arguments.
 def getPrefs():
     try:
         opts, args = getopt.getopt(sys.argv[1:],"hps:tv")
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         print(str(err))
         usage()
         sys.exit(2)
@@ -187,7 +187,7 @@ def generateCircles(spotName, numCircles, circleSize, border = 1):
     maxCircles = 5
     outfile = imageDir + spotName.lower().replace(" ", "") + ".png"
     imageWidth = int(c * maxCircles + gap * (maxCircles - 0.75))
-    imageHeight = c + gap
+    imageHeight = int(c + gap)
     im = Image.new("RGBA", (imageWidth, imageHeight), (0, 0, 0, 0))
     dr = ImageDraw.Draw(im)
     startX = gap / 8 + c / 2
@@ -270,7 +270,7 @@ def main(argv=None):
     else:
         # Retrieve feed data.
         try:
-            feed = urllib.urlopen(feedUrl)
+            feed = urllib.request.urlopen(feedUrl)
         except:
             print('Could not retrieve forecast data from %s' % getFeedUrl())
             exit()

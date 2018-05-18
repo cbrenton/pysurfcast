@@ -27,13 +27,13 @@ Examples:
 
  * Output the forecast for spot 163 (Morro Bay) as an image and echo "Morro Bay" to the terminal:
 
-    **./pysurfcast -s 163 -p**
+    **./pysurfcast.py -s 163 -p**
 
 ![alt text](http://i.imgur.com/gdRS2.png "GeekTool 3 on OS X")
 
  * Output the forecast for spot 6 (Natural Bridges) as text in the terminal:
 
-    **./pysurfcast -s 6 -t**
+    **./pysurfcast.py -s 6 -t**
 
 ![alt text](http://i.imgur.com/MwD4A.png "iTerm 2 on OS X")
 
