@@ -18,6 +18,8 @@ Please don't make fun of pysurfcast; it's very sensitive.
 
 Docker example:
 ```
+git clone https://github.com/cbrenton/pysurfcast
+cd pysurfcast
 docker run -it -v $(pwd)/images:/images sprutner/pysurfcast -s 6 -p
 ```
 
