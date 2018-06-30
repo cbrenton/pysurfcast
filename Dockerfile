@@ -5,4 +5,4 @@ RUN apk --no-cache add py-pip gcc musl-dev libjpeg-turbo-dev python-dev zlib-dev
 ENV LIBRARY_PATH=/lib:/usr/lib
 RUN pip install pillow
 
-CMD [ "python", "./pysurfcast.py" ]
+ENTRYPOINT [ "python", "./pysurfcast.py" ]
