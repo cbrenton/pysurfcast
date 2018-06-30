@@ -18,7 +18,7 @@ Please don't make fun of pysurfcast; it's very sensitive.
 
 Docker example:
 ```
-docker run -it 475b50bc97c5 python pysurfcast.py -s 6 -t
+docker run -it -v $(pwd)/images:/images sprutner/pysurfcast -s 6 -p
 ```
 
 Options:
