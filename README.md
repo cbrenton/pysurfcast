@@ -15,6 +15,14 @@ Please don't make fun of pysurfcast; it's very sensitive.
  * **Python 2.6** or above
 
 ## Running
+
+Docker example:
+```
+git clone https://github.com/cbrenton/pysurfcast
+cd pysurfcast
+docker run -v $(pwd)/images:/images sprutner/pysurfcast -s 6 -p
+```
+
 Options:
 
  * **-h**: Print help message and exit.
